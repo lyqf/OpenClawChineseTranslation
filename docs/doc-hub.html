@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 汉化版文档中心</title>
+    <meta name="description" content="OpenClaw 汉化版完整文档中心 — 安装指南、Docker 部署、国产模型配置、NAS 部署、常见问题等">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+    <script src="js/marked.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222;
+            --bg-sidebar: #161616;
+            --text: #e8e8e8;
+            --text-muted: #888;
+            --text-dim: #666;
+            --accent: #dc2626;
+            --accent-hover: #ef4444;
+            --border: #333;
+            --link: #60a5fa;
+            --code-bg: #1e1e1e;
+            --sidebar-w: 280px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        a { color: var(--link); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Header */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 56px; background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; gap: 16px;
+        }
+        .header-logo { font-size: 20px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .header-logo span { color: var(--accent); }
+        .header-back { color: var(--text-muted); font-size: 14px; }
+        .header-search {
+            margin-left: auto; padding: 6px 14px; border-radius: 6px;
+            border: 1px solid var(--border); background: var(--bg); color: var(--text);
+            font-size: 14px; width: 240px; outline: none;
+        }
+        .header-search:focus { border-color: var(--accent); }
+        .menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: 56px; left: 0; bottom: 0; width: var(--sidebar-w);
+            background: var(--bg-sidebar); border-right: 1px solid var(--border);
+            overflow-y: auto; padding: 16px 0; z-index: 90;
+        }
+        .sidebar-category { padding: 8px 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-item {
+            display: block; padding: 8px 20px 8px 32px; font-size: 14px; color: var(--text-dim);
+            cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { color: var(--text); background: rgba(255,255,255,0.03); text-decoration: none; }
+        .sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(220,38,38,0.05); font-weight: 500; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 20px; }
+
+        /* Main content */
+        .main {
+            margin-left: var(--sidebar-w); margin-top: 56px; padding: 40px 48px; max-width: 900px;
+        }
+
+        /* Index view */
+        .index-hero { margin-bottom: 40px; }
+        .index-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .index-hero p { color: var(--text-muted); font-size: 16px; }
+        .index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px; }
+        .index-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+            padding: 20px; cursor: pointer; transition: all 0.2s;
+        }
+        .index-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .index-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+        .index-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+        .index-section-title { font-size: 18px; font-weight: 700; margin: 32px 0 16px; display: flex; align-items: center; gap: 8px; }
+
+        /* Markdown content */
+        .doc-content { display: none; }
+        .doc-content.active { display: block; }
+        .doc-content h1 { font-size: 28px; font-weight: 800; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .doc-content h2 { font-size: 22px; font-weight: 700; margin: 32px 0 12px; }
+        .doc-content h3 { font-size: 18px; font-weight: 600; margin: 24px 0 8px; }
+        .doc-content h4 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+        .doc-content p { margin: 0 0 12px; }
+        .doc-content ul, .doc-content ol { margin: 0 0 12px; padding-left: 24px; }
+        .doc-content li { margin: 4px 0; }
+        .doc-content code {
+            background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+            font-family: "JetBrains Mono", "Fira Code", Consolas, monospace; font-size: 0.9em;
+        }
+        .doc-content pre {
+            background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+            padding: 16px; overflow-x: auto; margin: 0 0 16px;
+        }
+        .doc-content pre code { background: none; padding: 0; font-size: 13px; line-height: 1.6; }
+        .doc-content blockquote {
+            border-left: 4px solid var(--accent); padding: 12px 16px; margin: 0 0 16px;
+            background: rgba(220,38,38,0.05); border-radius: 0 8px 8px 0;
+        }
+        .doc-content blockquote p { margin: 0; color: var(--text-muted); }
+        .doc-content table { width: 100%; border-collapse: collapse; margin: 0 0 16px; }
+        .doc-content th, .doc-content td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+        .doc-content th { background: var(--bg-secondary); font-weight: 600; }
+        .doc-content img { max-width: 100%; border-radius: 8px; }
+        .doc-content hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+        .doc-content a { color: var(--link); }
+
+        /* Loading */
+        .loading { text-align: center; padding: 60px; color: var(--text-muted); }
+        .loading::after { content: ''; display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 404 */
+        .not-found { text-align: center; padding: 80px 20px; }
+        .not-found h2 { font-size: 24px; margin-bottom: 12px; }
+        .not-found p { color: var(--text-muted); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 24px 16px; }
+            .menu-btn { display: block; }
+            .header-search { width: 140px; }
+            .index-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+        <div class="header-logo">🦞 <span>OpenClaw</span> 文档中心</div>
+        <a href="./" class="header-back">← 返回首页</a>
+        <input class="header-search" type="text" placeholder="搜索文档..." id="searchInput" oninput="handleSearch(this.value)">
+    </header>
+
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <main class="main" id="main">
+        <div class="loading" id="loading">加载文档索引中</div>
+    </main>
+
+    <script>
+        let docsIndex = null;
+        let currentDocId = null;
+        const docCache = {};
+        const BASE_URL = location.origin;
+
+        // Initialize
+        async function init() {
+            try {
+                const res = await fetch('docs-index.json');
+                docsIndex = await res.json();
+                renderSidebar();
+                const hash = location.hash.slice(1);
+                if (hash) {
+                    loadDoc(hash);
+                } else {
+                    renderIndex();
+                }
+            } catch (e) {
+                document.getElementById('loading').innerHTML = '<div class="not-found"><h2>加载失败</h2><p>无法加载文档索引，请刷新重试。</p></div>';
+            }
+        }
+
+        // Render sidebar
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            let html = '<a class="sidebar-item" onclick="navigateTo(\'\')">📋 文档首页</a>';
+            html += '<div class="sidebar-divider"></div>';
+            for (const cat of docsIndex.categories) {
+                html += `<div class="sidebar-category">${cat.icon} ${cat.title}</div>`;
+                for (const doc of cat.docs) {
+                    html += `<a class="sidebar-item" data-id="${doc.id}" onclick="navigateTo('${doc.id}')">${doc.title}</a>`;
+                }
+                html += '<div class="sidebar-divider"></div>';
+            }
+            sidebar.innerHTML = html;
+        }
+
+        // Render index page
+        function renderIndex() {
+            currentDocId = null;
+            updateSidebarActive('');
+            const main = document.getElementById('main');
+            let html = '<div class="index-hero"><h1>🦞 OpenClaw 汉化版文档</h1><p>最全的 OpenClaw 中文文档，专为国内用户优化</p></div>';
+            for (const cat of docsIndex.categories) {
+                html += `<div class="index-section-title">${cat.icon} ${cat.title}</div><div class="index-grid">`;
+                for (const doc of cat.docs) {
+                    html += `<div class="index-card" onclick="navigateTo('${doc.id}')"><h3>${doc.title}</h3><p>${doc.description}</p></div>`;
+                }
+                html += '</div>';
+            }
+            main.innerHTML = html;
+        }
+
+        // Navigate to doc
+        function navigateTo(id) {
+            document.querySelector('.sidebar').classList.remove('open');
+            if (!id) {
+                location.hash = '';
+                renderIndex();
+                window.scrollTo(0, 0);
+                return;
+            }
+            location.hash = id;
+            loadDoc(id);
+        }
+
+        // Load and render a doc
+        async function loadDoc(id) {
+            const doc = findDoc(id);
+            if (!doc) {
+                document.getElementById('main').innerHTML = '<div class="not-found"><h2>文档未找到</h2><p>该文档尚未添加，敬请期待。</p><p><a href="#" onclick="navigateTo(\'\');return false;">返回文档首页</a></p></div>';
+                return;
+            }
+            currentDocId = id;
+            updateSidebarActive(id);
+            const main = document.getElementById('main');
+            main.innerHTML = '<div class="loading">加载中</div>';
+
+            try {
+                let content;
+                if (docCache[doc.file]) {
+                    content = docCache[doc.file];
+                } else {
+                    const res = await fetch(doc.file);
+                    if (!res.ok) throw new Error('Not found');
+                    content = await res.text();
+                    docCache[doc.file] = content;
+                }
+                main.innerHTML = `<div class="doc-content active">${marked.parse(content)}</div>`;
+                window.scrollTo(0, 0);
+            } catch (e) {
+                main.innerHTML = `<div class="not-found"><h2>文档加载失败</h2><p>文件 <code>${doc.file}</code> 尚未创建或无法访问。</p><p><a href="#" onclick="navigateTo('');return false;">返回文档首页</a></p></div>`;
+            }
+        }
+
+        // Find doc by id
+        function findDoc(id) {
+            for (const cat of docsIndex.categories) {
+                for (const doc of cat.docs) {
+                    if (doc.id === id) return doc;
+                }
+            }
+            return null;
+        }
+
+        // Update sidebar active state
+        function updateSidebarActive(id) {
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.id === id || (!id && !el.dataset.id));
+            });
+        }
+
+        // Search
+        function handleSearch(query) {
+            if (!query.trim()) { currentDocId ? loadDoc(currentDocId) : renderIndex(); return; }
+            const q = query.toLowerCase();
+            const results = [];
+            for (const cat of docsIndex.categories) {
+                for (const doc of cat.docs) {
+                    if (doc.title.toLowerCase().includes(q) || doc.description.toLowerCase().includes(q)) {
+                        results.push({ ...doc, category: cat.title });
+                    }
+                }
+            }
+            const main = document.getElementById('main');
+            if (results.length === 0) {
+                main.innerHTML = `<div class="not-found"><h2>未找到匹配的文档</h2><p>尝试其他关键词，或 <a href="#" onclick="document.getElementById('searchInput').value='';renderIndex();return false;">返回首页</a></p></div>`;
+                return;
+            }
+            let html = `<div class="index-hero"><h1>搜索结果</h1><p>找到 ${results.length} 篇匹配文档</p></div><div class="index-grid">`;
+            for (const r of results) {
+                html += `<div class="index-card" onclick="navigateTo('${r.id}')"><h3>${r.title}</h3><p>${r.description}</p><p style="font-size:11px;color:var(--text-dim);margin-top:4px;">${r.category}</p></div>`;
+            }
+            html += '</div>';
+            main.innerHTML = html;
+        }
+
+        // Hash change
+        window.addEventListener('hashchange', () => {
+            const hash = location.hash.slice(1);
+            hash ? loadDoc(hash) : renderIndex();
+        });
+
+        init();
+    </script>
+</body>
+</html>
